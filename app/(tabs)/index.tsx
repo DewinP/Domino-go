@@ -1,64 +1,114 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
+import React from 'react';
+import { Image, StyleSheet, Platform, SafeAreaView, Pressable, ScrollView, Button } from 'react-native';
 import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useSimpleStore } from '@/app/stores/simpleSlice';
+import LinearGradient from 'react-native-linear-gradient';
 
 export default function HomeScreen() {
+  const team1Score = useSimpleStore((state) => state.team1Scores)
+  const team2Score = useSimpleStore((state) => state.team2Scores)
+  const increaseTeamScore1 = useSimpleStore((state) => state.addTeam1Score)
+  const increaseTeamScore2 = useSimpleStore((state) => state.addTeam2Score);
+  const resetScores = useSimpleStore((state) => state.resetScores);
+
+
+  const totalTeam1Score = team1Score.length ? team1Score.reduce((a,b)=>{return a+b}): 0;
+  const totalTeam2Score = team2Score.length ? team2Score.reduce((a,b)=>{return a+b}): 0;
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
+    <ThemedView safeArea style={styles.mainContainer}>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
+        <ThemedView>
+          <ThemedText type="title">Scoreboard</ThemedText>
+        </ThemedView>
+          <ThemedText type="link" onPress={resetScores}>⚙️</ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
+      <ThemedView style={styles.totalContainer}>
+        <ThemedView style={styles.singleScoreContainer}>
+          <ThemedText type="defaultSemiBold" style={styles.targetScoreText}>/ 200</ThemedText>
+          <ThemedText type="title" style={styles.currentScoreText}>{totalTeam1Score}</ThemedText>
+          <ThemedText type="link" style={styles.currentScoreText}>Team 1</ThemedText>
+        </ThemedView>
+        <ThemedView style={styles.verticleLine}></ThemedView>
+        <ThemedView style={styles.singleScoreContainer}>
+          <ThemedText type="defaultSemiBold" style={styles.targetScoreText}>/ 200</ThemedText>
+          <ThemedText type="title" style={styles.currentScoreText}>{totalTeam2Score}</ThemedText>
+          <ThemedText type="link" style={styles.currentScoreText}>Team 2</ThemedText>
+        </ThemedView>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    
+        <ScrollView>
+        {team1Score.map((team1Score, index) => {
+          return <ThemedView key={index} style={styles.singleCellContainer}>
+            <ThemedText type='title' >{team1Score}</ThemedText>
+            <ThemedText type='title' >{team2Score[index]}</ThemedText>
+        </ThemedView>
+        }
+        )}
+        </ScrollView>
+        <ThemedView style={styles.inputContainer}>
+          <Button title="Add" onPress={()=> increaseTeamScore1(10)}   color="#1A3636"  accessibilityLabel="Learn more about this purple button"/>
+          <Button  title="Add" onPress={()=> increaseTeamScore2(10)} color="#1A3636" accessibilityLabel="Learn more about this purple button"/>
+        </ThemedView>
+        
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  mainContainer: {
+    flex: 1,
+  },
+  inputContainer:{
+    position: 'absolute',
+    bottom: 0,
+
+    
+    width: '100%',
+    padding: 10,
+
+    backgroundColor: 'white',
+    display: 'flex',
     flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  titleContainer: {
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  totalContainer: {
+    paddingHorizontal: 50,
+    paddingVertical: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     gap: 8,
   },
-  stepContainer: {
+  singleCellContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingHorizontal: 40,
+    paddingVertical: 5,
+  },  
+  singleScoreContainer: {
+    flex:1,
+    alignItems: 'center',
+    position: 'relative',
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+  },
+  scoreboardContianer: {
     gap: 8,
     marginBottom: 8,
+    alignItems: 'center',
   },
   reactLogo: {
     height: 178,
@@ -67,4 +117,20 @@ const styles = StyleSheet.create({
     left: 0,
     position: 'absolute',
   },
+  verticleLine: {
+    height: '100%',
+    width: 1,
+    backgroundColor: '#909090',
+  },
+  currentScoreText:{
+    fontWeight: 'bold',
+    position: 'relative',
+  },
+  targetScoreText:{
+    fontWeight: 'bold',
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    fontSize: 12,
+  }
 });
