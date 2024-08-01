@@ -11,6 +11,7 @@ import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -35,7 +36,7 @@ export default function RootLayout() {
       <ActionSheetProvider>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
+          <Stack.Screen name="+not-found" options={{ title: "Not Found" }} />
           <Stack.Screen
             name="modal/[team]"
             options={{
